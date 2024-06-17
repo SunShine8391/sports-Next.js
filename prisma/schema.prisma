@@ -1,0 +1,72 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL") 
+}
+
+model Profile {
+  id                   String     @id @default(uuid()) @db.Uuid
+  name                 String?
+  email                String?
+  customerId           String?    @map("customer_id")
+
+  predictions          Prediction[]
+  @@map("profiles")
+}
+
+model Prediction {
+  id Int @id @default(autoincrement())
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @default(now()) @map("updated_at")
+
+  status    PredictionStatus  @default(SAVED)
+  matchDay  Int @map("match_day")
+  scores    Json 
+
+  userId    String   @db.Uuid
+  user      Profile  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("predictions")
+}
+
+model Competition {
+  id        Int       @id             @default(autoincrement())
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  league          Int       
+  currentSeason   Int @map("current_season")
+  currentRound    Int @map("current_round")
+
+  @@map("competitions")
+}
+
+model Matchday {
+  id        Int       @id             @default(autoincrement())
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @default(now()) @map("updated_at")
+
+  season    Int
+  league    Int
+  round     Int
+  scores    Json
+
+  isCurrent   Boolean
+  isCompleted Boolean 
+
+  @@map("matchdays")
+}
+
+enum PredictionStatus {
+  SAVED
+  PAYMENT_CONFIRMED
+  EXPIRED
+
+  @@map("prediction_statuses")
+}

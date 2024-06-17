@@ -1,0 +1,12 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/sync-competition-data",
+      "schedule": "0 0 * * *"
+    },
+    {
+      "path": "/api/cron/sync-matchday-data",
+      "schedule": "0 0 * * *"
+    }
+  ]
+}
